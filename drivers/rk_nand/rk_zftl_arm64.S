@@ -5,8 +5,8 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * date: 2019-06-03
- * function: rk ftl v6 for rockchip soc base on arm v8 to support 3D/2D
+ * date: 2019-04-27
+ * function: rk ftl v5 for rockchip soc base on arm v8 to support 3D/2D
  *	     TLC and MLC.
  */
 	.cpu generic+fp+simd
@@ -1539,7 +1539,7 @@ flash_wait_device_ready_raw:
 	adrp	x1, .LANCHOR1
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR1
-	mov	w2, 678
+	mov	w2, 677
 	add	x1, x1, 240
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -1829,7 +1829,7 @@ flash_start_page_read:
 	adrp	x1, .LANCHOR1
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR1
-	mov	w2, 846
+	mov	w2, 845
 	add	x1, x1, 272
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -2116,7 +2116,7 @@ flash_start_plane_read:
 	adrp	x1, .LANCHOR1
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR1
-	mov	w2, 941
+	mov	w2, 940
 	add	x1, x1, 712
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -2815,7 +2815,7 @@ flash_erase_duplane_block:
 	adrp	x1, .LANCHOR1
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR1
-	mov	w2, 589
+	mov	w2, 588
 	add	x1, x1, 736
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -2928,7 +2928,7 @@ flash_erase_block_en:
 	adrp	x1, .LANCHOR1
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR1
-	mov	w2, 634
+	mov	w2, 633
 	add	x1, x1, 768
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -3337,46 +3337,47 @@ nandc_get_chip_if:
 	ret
 	.size	nandc_get_chip_if, .-nandc_get_chip_if
 	.align	2
-	.global	zbuf_init
-	.type	zbuf_init, %function
-zbuf_init:
+	.global	buf_init
+	.type	buf_init, %function
+buf_init:
 	stp	x29, x30, [sp, -48]!
 	adrp	x0, .LANCHOR0
 	add	x29, sp, 0
 	stp	x19, x20, [sp,16]
 	add	x19, x0, :lo12:.LANCHOR0
-	mov	w20, 0
 	stp	x21, x22, [sp,32]
 	add	x19, x19, 784
+	mov	w21, 0
 	mov	x22, x0
 .L569:
-	add	x21, x22, :lo12:.LANCHOR0
-	uxtb	w0, w20
+	add	x20, x22, :lo12:.LANCHOR0
+	uxtb	w0, w21
 	add	w1, w0, 1
 	strb	w0, [x19,1]
 	strb	w1, [x19]
-	add	w20, w20, 1
-	ldrb	w0, [x21,2832]
+	add	w21, w21, 1
+	ldrb	w0, [x20,2832]
 	add	x19, x19, 64
 	strb	wzr, [x19,-62]
 	str	xzr, [x19,-48]
 	lsl	w0, w0, 9
 	bl	ftl_malloc
 	str	x0, [x19,-56]
-	mov	w0, 64
+	ldrb	w0, [x20,2832]
+	lsl	w0, w0, 1
 	bl	ftl_malloc
 	str	x0, [x19,-40]
-	cmp	w20, 32
+	cmp	w21, 32
 	bne	.L569
-	strb	w20, [x21,2834]
+	strb	w21, [x20,2834]
 	mov	w0, -1
-	strb	wzr, [x21,2833]
-	strb	w0, [x21,2768]
-	ldp	x19, x20, [sp,16]
+	strb	wzr, [x20,2833]
+	strb	w0, [x20,2768]
 	ldp	x21, x22, [sp,32]
+	ldp	x19, x20, [sp,16]
 	ldp	x29, x30, [sp], 48
 	ret
-	.size	zbuf_init, .-zbuf_init
+	.size	buf_init, .-buf_init
 	.align	2
 	.global	buf_reinit
 	.type	buf_reinit, %function
@@ -3490,9 +3491,9 @@ queue_read_cmd:
 	ret
 	.size	queue_read_cmd, .-queue_read_cmd
 	.align	2
-	.global	zbuf_free
-	.type	zbuf_free, %function
-zbuf_free:
+	.global	buf_free
+	.type	buf_free, %function
+buf_free:
 	stp	x29, x30, [sp, -32]!
 	add	x29, sp, 0
 	str	x19, [sp,16]
@@ -3524,7 +3525,7 @@ zbuf_free:
 	ldr	x19, [sp,16]
 	ldp	x29, x30, [sp], 32
 	ret
-	.size	zbuf_free, .-zbuf_free
+	.size	buf_free, .-buf_free
 	.align	2
 	.global	buf_alloc
 	.type	buf_alloc, %function
@@ -4544,7 +4545,7 @@ gc_write_completed:
 	sbfiz	x0, x0, 6, 32
 	add	x0, x27, x0
 	strb	wzr, [x0,61]
-	bl	zbuf_free
+	bl	buf_free
 	ldrb	w0, [x19,2903]
 	sub	w0, w0, #1
 	strb	w0, [x19,2903]
@@ -4658,7 +4659,7 @@ gc_free_temp_buf:
 	ldrb	w5, [x0,61]
 	cbnz	w5, .L723
 	str	x1, [x29,56]
-	bl	zbuf_free
+	bl	buf_free
 	adrp	x0, .LANCHOR2
 	ldr	x1, [x29,56]
 	ldr	w0, [x0,#:lo12:.LANCHOR2]
@@ -7229,7 +7230,7 @@ ftl_write_buf:
 .L1146:
 	mov	x0, x20
 	add	x19, x19, :lo12:.LANCHOR0
-	bl	zbuf_free
+	bl	buf_free
 	ldrb	w0, [x19,2856]
 	b	.L1153
 .L1147:
@@ -7356,7 +7357,7 @@ ftl_write_completed:
 	b	.L1155
 .L1162:
 	mov	x0, x24
-	bl	zbuf_free
+	bl	buf_free
 	b	.L1155
 .L1164:
 	ldp	x19, x20, [sp,16]
@@ -11987,7 +11988,7 @@ flash_read_page_en:
 	adrp	x1, .LANCHOR3
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR3
-	mov	w2, 399
+	mov	w2, 398
 	add	x1, x1, 136
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -12463,7 +12464,7 @@ flash_complete_plane_page_read:
 	adrp	x1, .LANCHOR3
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR3
-	mov	w2, 887
+	mov	w2, 886
 	add	x1, x1, 160
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -12577,7 +12578,7 @@ flash_complete_page_read:
 	adrp	x1, .LANCHOR3
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR3
-	mov	w2, 1009
+	mov	w2, 1008
 	add	x1, x1, 192
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -13410,7 +13411,7 @@ flash_start_tlc_page_prog:
 	adrp	x1, .LANCHOR3
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR3
-	mov	w2, 727
+	mov	w2, 726
 	add	x1, x1, 272
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -13749,7 +13750,7 @@ flash_start_3d_mlc_page_prog:
 	adrp	x1, .LANCHOR3
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR3
-	mov	w2, 757
+	mov	w2, 756
 	add	x1, x1, 304
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -13923,7 +13924,7 @@ flash_start_page_prog:
 	adrp	x1, .LANCHOR3
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR3
-	mov	w2, 804
+	mov	w2, 803
 	add	x1, x1, 336
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -14597,7 +14598,7 @@ flash_prog_page_en:
 	adrp	x1, .LANCHOR3
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR3
-	mov	w2, 547
+	mov	w2, 546
 	add	x1, x1, 376
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -14721,7 +14722,7 @@ flash_prog_page_en:
 	adrp	x1, .LANCHOR3
 	adrp	x0, .LC0
 	add	x1, x1, :lo12:.LANCHOR3
-	mov	w2, 578
+	mov	w2, 577
 	add	x1, x1, 376
 	add	x0, x0, :lo12:.LC0
 	bl	printk
@@ -15967,7 +15968,7 @@ ftl_open_sblk_recovery:
 	b	.L2488
 .L2582:
 	mov	x0, x27
-	bl	zbuf_free
+	bl	buf_free
 	ldrh	w1, [x22,3324]
 	ldrh	w0, [x25,12]
 	ldrb	w2, [x25,9]
@@ -16379,7 +16380,7 @@ ftl_dump_write_open_sblk:
 	b	.L2611
 .L2616:
 	mov	x0, x19
-	bl	zbuf_free
+	bl	buf_free
 	adrp	x0, .LC200
 	mov	w1, w23
 	add	x0, x0, :lo12:.LC200
@@ -16711,7 +16712,7 @@ nand_flash_init:
 	adrp	x0, .LC134
 	add	x2, x2, :lo12:.LANCHOR3
 	add	x0, x0, :lo12:.LC134
-	mov	w1, 2491
+	mov	w1, 2490
 	add	x2, x2, 568
 	bl	printk
 .L2673:
@@ -16789,13 +16790,13 @@ nand_flash_init:
 .L2680:
 	add	w22, w22, 1
 	add	x23, x23, 32
-	cmp	w22, 39
+	cmp	w22, 38
 	bne	.L2682
 	b	.L2677
 .L2684:
 	add	x4, x1, x0, lsl 5
 	mov	w2, w0
-	ldrb	w4, [x4,1688]
+	ldrb	w4, [x4,1656]
 	cmp	w4, w3
 	beq	.L2683
 	add	x0, x0, 1
@@ -16805,7 +16806,7 @@ nand_flash_init:
 .L2683:
 	add	x23, x20, :lo12:.LANCHOR2
 	add	x24, x19, :lo12:.LANCHOR0
-	add	x1, x23, 1688
+	add	x1, x23, 1656
 	ubfiz	x2, x2, 5, 32
 	add	x1, x1, x2
 	add	x0, x24, 640
@@ -16840,7 +16841,7 @@ nand_flash_init:
 	adrp	x0, .LC134
 	add	x2, x2, :lo12:.LANCHOR3
 	add	x0, x0, :lo12:.LC134
-	mov	w1, 2516
+	mov	w1, 2515
 	add	x2, x2, 568
 	bl	printk
 .L2688:
@@ -17001,7 +17002,7 @@ nand_flash_init:
 	adrp	x0, .LC134
 	add	x2, x2, :lo12:.LANCHOR3
 	add	x0, x0, :lo12:.LC134
-	mov	w1, 2574
+	mov	w1, 2573
 	add	x2, x2, 568
 	bl	printk
 .L2704:
@@ -17029,7 +17030,7 @@ nand_flash_init:
 	adrp	x0, .LC134
 	add	x2, x2, :lo12:.LANCHOR3
 	add	x0, x0, :lo12:.LC134
-	mov	w1, 2606
+	mov	w1, 2605
 	add	x2, x2, 568
 	bl	printk
 .L2708:
@@ -17076,7 +17077,7 @@ nand_flash_init:
 	adrp	x0, .LC134
 	add	x2, x2, :lo12:.LANCHOR3
 	add	x0, x0, :lo12:.LC134
-	mov	w1, 2672
+	mov	w1, 2671
 	add	x2, x2, 568
 	bl	printk
 .L2713:
@@ -17174,7 +17175,7 @@ ftl_sysblk_dump:
 	mov	w3, 32
 	bl	rknand_print_hex
 	mov	x0, x20
-	bl	zbuf_free
+	bl	buf_free
 	cbz	w21, .L2760
 	adrp	x1, .LANCHOR3
 	adrp	x0, .LC0
@@ -17984,7 +17985,7 @@ gc_recovery:
 	beq	.L2851
 .L2850:
 	mov	x0, x21
-	bl	zbuf_free
+	bl	buf_free
 	ldr	x7, [x21,24]
 	ldr	x6, [x21,8]
 	ldr	w0, [x7,4]
@@ -18097,7 +18098,7 @@ gc_recovery:
 	cmn	w0, #1
 	beq	.L2881
 	mov	x0, x21
-	bl	zbuf_free
+	bl	buf_free
 .L2894:
 	add	x0, x19, :lo12:.LANCHOR0
 	ldrh	w2, [x20,80]
@@ -18142,7 +18143,7 @@ gc_recovery:
 	mov	x0, x21
 	mov	w21, 0
 	mov	w28, w21
-	bl	zbuf_free
+	bl	buf_free
 	str	w21, [x29,136]
 	add	x0, x19, :lo12:.LANCHOR0
 	ldrb	w1, [x22,9]
@@ -18562,7 +18563,7 @@ zftl_init:
 	bl	printk
 .L2915:
 	add	x22, x19, :lo12:.LANCHOR0
-	bl	zbuf_init
+	bl	buf_init
 	mov	w0, 6
 	adrp	x23, .LANCHOR5
 	ldrh	w1, [x22,576]
@@ -19207,7 +19208,7 @@ gc_scan_src_blk_one_page:
 	b	.L3023
 .L3045:
 	mov	x0, x21
-	bl	zbuf_free
+	bl	buf_free
 	ldrb	w0, [x20,4]
 	ldrb	w1, [x19,3300]
 	add	w0, w0, 1
@@ -19408,7 +19409,7 @@ gc_scan_src_blk:
 	bl	dump_stack
 .L3077:
 	mov	x0, x21
-	bl	zbuf_free
+	bl	buf_free
 	mov	w0, -1
 	b	.L3048
 .L3059:
@@ -19460,7 +19461,7 @@ gc_scan_src_blk:
 	b	.L3060
 .L3078:
 	mov	x0, x21
-	bl	zbuf_free
+	bl	buf_free
 	add	x0, x19, :lo12:.LANCHOR0
 	ldrh	w1, [x0,2896]
 	ldr	x3, [x0,600]
@@ -19557,7 +19558,7 @@ gc_scan_static_data:
 	bl	dump_stack
 .L3084:
 	mov	x0, x23
-	bl	zbuf_free
+	bl	buf_free
 .L3082:
 	add	x2, x19, :lo12:.LANCHOR0
 	ldr	x1, [x2,608]
@@ -19798,7 +19799,7 @@ gc_block_vpn_scan:
 .L3132:
 	bl	gc_add_sblk
 	mov	x0, x23
-	bl	zbuf_free
+	bl	buf_free
 	b	.L3095
 .L3110:
 	ldrb	w0, [x21,3300]
@@ -19848,7 +19849,7 @@ gc_block_vpn_scan:
 	b	.L3111
 .L3133:
 	mov	x0, x23
-	bl	zbuf_free
+	bl	buf_free
 	adrp	x0, .LANCHOR2
 	ldr	w0, [x0,#:lo12:.LANCHOR2]
 	tbz	x0, 8, .L3115
@@ -20129,7 +20130,7 @@ ftl_sblk_dump:
 	b	.L3137
 .L3153:
 	mov	x0, x28
-	bl	zbuf_free
+	bl	buf_free
 	ldr	x3, [x29,136]
 	adrp	x0, .LC254
 	ldr	x2, [x21,600]
@@ -20493,7 +20494,7 @@ zftl_read:
 	str	x2, [x29,112]
 	bl	buf_remove_buf
 	mov	x0, x25
-	bl	zbuf_free
+	bl	buf_free
 	ldr	x2, [x29,112]
 	ldrb	w0, [x2,3908]
 	sub	w0, w0, #1
@@ -20819,7 +20820,7 @@ zftl_debug_proc_write:
 .L3270:
 	bl	rknand_print_hex
 	mov	x0, x19
-	bl	zbuf_free
+	bl	buf_free
 	b	.L3252
 .L3259:
 	adrp	x1, .LC272
@@ -21360,7 +21361,7 @@ ftl_write_commit:
 	cmp	w23, w2
 	bcc	.L3345
 	mov	x0, x27
-	bl	zbuf_free
+	bl	buf_free
 	mov	w0, -1
 	b	.L3399
 .L3345:
@@ -21391,7 +21392,7 @@ ftl_write_commit:
 	add	x1, x25, x1
 	bl	ftl_memcpy
 	mov	x0, x27
-	bl	zbuf_free
+	bl	buf_free
 	b	.L3341
 .L3347:
 	mov	w0, w23
@@ -21581,7 +21582,7 @@ ftl_write_commit:
 	add	x0, x0, 3909
 	bl	buf_remove_buf
 	mov	x0, x26
-	bl	zbuf_free
+	bl	buf_free
 .L3355:
 	ldrh	w0, [x19,6]
 	cbnz	w0, .L3370
@@ -21758,7 +21759,7 @@ gc_do_copy_back:
 	ldrb	w2, [x0,2]
 	tbz	x2, 1, .L3410
 	mov	x0, x20
-	bl	zbuf_free
+	bl	buf_free
 	adrp	x0, .LANCHOR2
 	ldr	w0, [x0,#:lo12:.LANCHOR2]
 	tbz	x0, 8, .L3403
@@ -21831,7 +21832,7 @@ gc_do_copy_back:
 	bl	printk
 .L3415:
 	mov	x0, x20
-	bl	zbuf_free
+	bl	buf_free
 	b	.L3403
 .L3404:
 	ldrb	w24, [x21,3281]
@@ -21855,7 +21856,7 @@ gc_do_copy_back:
 	adrp	x0, .LANCHOR2
 	ldrb	w21, [x22,9]
 	add	x0, x0, :lo12:.LANCHOR2
-	add	x0, x0, 1816
+	add	x0, x0, 1784
 	str	w24, [x29,136]
 	sdiv	w1, w20, w21
 	msub	w20, w1, w21, w20
@@ -23358,7 +23359,7 @@ zftl_do_gc:
 	strh	w0, [x1,130]
 	ldr	x0, [x20,2904]
 	cbz	x0, .L3612
-	bl	zbuf_free
+	bl	buf_free
 .L3612:
 	add	x19, x19, :lo12:.LANCHOR0
 	add	x23, x23, :lo12:.LANCHOR4
@@ -23456,7 +23457,7 @@ zftl_do_gc:
 	strh	w0, [x2,126]
 	strh	w0, [x1,130]
 	ldr	x0, [x19,2904]
-	bl	zbuf_free
+	bl	buf_free
 	str	xzr, [x19,2904]
 	strb	wzr, [x23,1146]
 .L3701:
@@ -23471,7 +23472,7 @@ zftl_do_gc:
 	mov	w0, 6
 	strb	w0, [x23,1146]
 	ldr	x0, [x24,2904]
-	bl	zbuf_free
+	bl	buf_free
 	str	xzr, [x24,2904]
 	b	.L3697
 .L3620:
@@ -24447,7 +24448,7 @@ CRC_32:
 	cmp	w1, w2
 	bls	.L3860
 	ldrb	w4, [x5,x2]
-	add	x6, x3, 2584
+	add	x6, x3, 2552
 	add	x2, x2, 1
 	eor	w4, w4, w0, lsr 24
 	ldr	w4, [x6,w4,uxtw 2]
@@ -27073,7 +27074,7 @@ __func__.33568:
 .LC1:
 	.string	"%s\n"
 .LC2:
-	.string	"FTL version: 6.0.16 20190603"
+	.string	"FTL version: 6.0.16 20190427"
 .LC3:
 	.string	"zftl_debug:0x%x\n"
 .LC4:
@@ -28174,7 +28175,7 @@ hy_f26_ref_value:
 	.byte	-37
 	.zero	4
 	.type	zftl_nand_flash_para_tbl, %object
-	.size	zftl_nand_flash_para_tbl, 1248
+	.size	zftl_nand_flash_para_tbl, 1216
 zftl_nand_flash_para_tbl:
 	.byte	6
 	.byte	-104
@@ -28985,34 +28986,6 @@ zftl_nand_flash_para_tbl:
 	.byte	0
 	.hword	256
 	.byte	3
-	.byte	0
-	.byte	0
-	.byte	0
-	.byte	5
-	.byte	44
-	.byte	-124
-	.byte	100
-	.byte	60
-	.byte	-87
-	.byte	4
-	.byte	4
-	.byte	1
-	.byte	32
-	.hword	512
-	.byte	2
-	.byte	2
-	.hword	1024
-	.hword	479
-	.byte	3
-	.byte	17
-	.byte	40
-	.byte	32
-	.byte	1
-	.byte	0
-	.byte	1
-	.byte	0
-	.hword	512
-	.byte	0
 	.byte	0
 	.byte	0
 	.byte	0
