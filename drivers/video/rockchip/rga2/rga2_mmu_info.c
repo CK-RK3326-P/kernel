@@ -392,11 +392,11 @@ static int rga2_UserMemory_cheeck(struct page **pages, u32 w, u32 h, u32 format,
 		tai_vaddr = (int *)vaddr + taidata_num / 4 - 1;
 	}
 	if (flag == 1) {
-		printk(KERN_DEBUG "src user memory check\n");
-		printk(KERN_DEBUG "tai data is %d\n", *tai_vaddr);
+		pr_info("src user memory check\n");
+		pr_info("tai data is %d\n", *tai_vaddr);
 	} else {
-		printk(KERN_DEBUG "dst user memory check\n");
-		printk(KERN_DEBUG "tai data is %d\n", *tai_vaddr);
+		pr_info("dst user memory check\n");
+		pr_info("tai data is %d\n", *tai_vaddr);
 	}
 	if (taidata_num == 0)
 		kunmap(pages[taipage_num - 1]);
@@ -426,7 +426,11 @@ static int rga2_MapUserMemory(struct page **pages, uint32_t *pageTable,
 	status = 0;
 	Address = 0;
 	down_read(&current->mm->mmap_sem);
-#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 4, 168) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 5, 0)
+	result = get_user_pages(current, current->mm, Memory << PAGE_SHIFT,
+				pageCount, writeFlag ? FOLL_WRITE : 0,
+				pages, NULL);
+#elif LINUX_VERSION_CODE < KERNEL_VERSION(4, 6, 0)
 	result = get_user_pages(current, current->mm, Memory << PAGE_SHIFT,
 				pageCount, writeFlag, 0, pages, NULL);
 #else
