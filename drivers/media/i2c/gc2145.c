@@ -2220,6 +2220,7 @@ static int gc2145_set_fmt(struct v4l2_subdev *sd,
 	return ret;
 }
 
+static int gc2145_init(struct v4l2_subdev *sd, u32 val);
 static int gc2145_s_stream(struct v4l2_subdev *sd, int on)
 {
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
@@ -2244,6 +2245,11 @@ static int gc2145_s_stream(struct v4l2_subdev *sd, int on)
 		gc2145->streaming = on;
 		goto unlock;
 	}
+
+	ret = gc2145_init(sd, 0);
+	usleep_range(10000, 20000);
+	if (ret)
+		dev_err(&client->dev, "init error\n");
 
 	ret = gc2145_write_array(client, gc2145->frame_size->regs);
 	if (ret)
@@ -2468,7 +2474,6 @@ static int gc2145_power(struct v4l2_subdev *sd, int on)
 	int ret;
 	struct gc2145 *gc2145 = to_gc2145(sd);
 	struct i2c_client *client = gc2145->client;
-	struct device *dev = &gc2145->client->dev;
 
 	dev_info(&client->dev, "%s(%d) on(%d)\n", __func__, __LINE__, on);
 	if (on) {
@@ -2476,10 +2481,11 @@ static int gc2145_power(struct v4l2_subdev *sd, int on)
 			gpiod_set_value_cansleep(gc2145->pwdn_gpio, 0);
 			usleep_range(2000, 5000);
 		}
+
 		ret = gc2145_init(sd, 0);
 		usleep_range(10000, 20000);
 		if (ret)
-			dev_err(dev, "init error\n");
+			dev_err(&client->dev, "init error\n");
 	} else {
 		if (!IS_ERR(gc2145->pwdn_gpio)) {
 			gpiod_set_value_cansleep(gc2145->pwdn_gpio, 1);
