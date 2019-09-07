@@ -34,6 +34,8 @@ struct rk1608_power_work {
 	struct completion work_fin;
 };
 
+static struct rk1608_power_work gwork;
+
 /**
  * Rk1608 is used as the Pre-ISP to link on Soc, which mainly has two
  * functions. One is to download the firmware of RK1608, and the other
@@ -813,6 +815,21 @@ static int rk1608_power_on(struct rk1608_state *pdata)
 	struct spi_device *spi = pdata->spi;
 	int ret = 0;
 
+	if (!IS_ERR(pdata->mclk)) {
+		ret = clk_set_rate(pdata->mclk, RK1608_MCLK_RATE);
+		if (ret < 0)
+			dev_warn(pdata->dev, "Failed to set mclk rate\n");
+		if (clk_get_rate(pdata->mclk) != RK1608_MCLK_RATE)
+			dev_warn(pdata->dev, "mclk(%lu) mismatched\n",
+				 clk_get_rate(pdata->mclk));
+
+		ret = clk_prepare_enable(pdata->mclk);
+		if (ret < 0)
+			dev_warn(pdata->dev, "Failed to enable mclk\n");
+		else
+			usleep_range(3000, 3500);
+	}
+
 	/* Request rk1608 enter slave mode */
 	rk1608_cs_set_value(pdata, 0);
 	if (pdata->wakeup_gpio)
@@ -862,6 +879,9 @@ static int rk1608_power_off(struct rk1608_state *pdata)
 		gpiod_direction_output(pdata->reset_gpio, 0);
 	rk1608_cs_set_value(pdata, 0);
 
+	if (!IS_ERR(pdata->mclk))
+		clk_disable_unprepare(pdata->mclk);
+
 	return 0;
 }
 
@@ -887,34 +907,37 @@ int rk1608_set_power(struct rk1608_state *pdata, int on)
 static void rk1608_poweron_func(struct work_struct *work)
 {
 	struct rk1608_power_work *pwork = (struct rk1608_power_work *)work;
+	int ret = rk1608_power_on(pwork->pdata);
 
-	rk1608_power_on(pwork->pdata);
-	complete(&pwork->work_fin);
+	if (!ret)
+		complete(&pwork->work_fin);
 }
 
 static int rk1608_sensor_power(struct v4l2_subdev *sd, int on)
 {
 	struct rk1608_state *pdata = to_state(sd);
-	struct rk1608_power_work work;
+	int ret = 0;
 
 	mutex_lock(&pdata->lock);
 	if (on) {
 		if (!pdata->power_count) {
-			INIT_WORK(&work.wk, rk1608_poweron_func);
-			init_completion(&work.work_fin);
-			work.pdata = pdata;
-			schedule_work(&work.wk);
+			INIT_WORK(&gwork.wk, rk1608_poweron_func);
+			init_completion(&gwork.work_fin);
+			gwork.pdata = pdata;
+			schedule_work(&gwork.wk);
 
 			v4l2_subdev_call(pdata->sensor[sd->grp_id],
 					 core, s_power, on);
-			if (!wait_for_completion_timeout(&work.work_fin,
-					msecs_to_jiffies(1000)))
+			if (!wait_for_completion_timeout(&gwork.work_fin,
+					msecs_to_jiffies(1000))) {
 				dev_err(pdata->dev,
 					"wait for preisp power on timeout!");
+				ret = -EBUSY;
+			}
 		}
 	} else if (!on && pdata->power_count == 1) {
 		v4l2_subdev_call(pdata->sensor[sd->grp_id], core, s_power, on);
-		rk1608_power_off(pdata);
+		ret = rk1608_power_off(pdata);
 	}
 
 	/* Update the power count. */
@@ -922,7 +945,7 @@ static int rk1608_sensor_power(struct v4l2_subdev *sd, int on)
 	WARN_ON(pdata->power_count < 0);
 	mutex_unlock(&pdata->lock);
 
-	return 0;
+	return ret;
 }
 
 static int rk1608_stream_on(struct rk1608_state *pdata)
@@ -1087,6 +1110,11 @@ static int rk1608_g_volatile_ctrl(struct v4l2_ctrl *ctrl)
 		container_of(ctrl->handler,
 			     struct rk1608_state, ctrl_handler);
 	int id = pdata->sd.grp_id;
+
+	if (!pdata->sensor[id]) {
+		dev_err(pdata->dev, "Did not find a sensor[%d]!\n", id);
+		return -EINVAL;
+	}
 
 	remote_ctrl = v4l2_ctrl_find(pdata->sensor[id]->ctrl_handler,
 				     ctrl->id);
@@ -1550,6 +1578,10 @@ static int rk1608_parse_dt_property(struct rk1608_state *pdata)
 		dev_err(dev, "can not find aesync_gpio\n");
 		return PTR_ERR(pdata->aesync_gpio);
 	}
+
+	pdata->mclk = devm_clk_get(dev, "mclk");
+	if (IS_ERR(pdata->mclk))
+		dev_warn(dev, "Failed to get mclk, do you use ext 24M clk?\n");
 
 	pdata->msg_num = 0;
 	init_waitqueue_head(&pdata->msg_wait);
