@@ -2121,9 +2121,6 @@ int rkisp1_dma_attach_device(struct rkisp1_device *rkisp1_dev)
 	struct device *dev = rkisp1_dev->dev;
 	int ret;
 
-	if (!domain)
-		return 0;
-
 	ret = iommu_attach_device(domain, dev);
 	if (ret) {
 		dev_err(dev, "Failed to attach iommu device\n");
@@ -2144,8 +2141,7 @@ void rkisp1_dma_detach_device(struct rkisp1_device *rkisp1_dev)
 	struct iommu_domain *domain = rkisp1_dev->domain;
 	struct device *dev = rkisp1_dev->dev;
 
-	if (domain)
-		iommu_detach_device(domain, dev);
+	iommu_detach_device(domain, dev);
 }
 
 /****************  Interrupter Handler ****************/
