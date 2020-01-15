@@ -153,7 +153,7 @@
 		pinctrl-1 = <&uart1_rts_gpio>;
 		BT,reset_gpio = <&gpio0 RK_PC1 GPIO_ACTIVE_HIGH>;
 		BT,wake_gpio = <&gpio0 RK_PA1 GPIO_ACTIVE_HIGH>;
-		//BT,wake_host_irq = <&gpio0 RK_PA7 GPIO_ACTIVE_HIGH>;
+		BT,wake_host_irq = <&gpio0 RK_PA7 GPIO_ACTIVE_HIGH>;
 		status = "okay";
 	};
 };
@@ -548,7 +548,7 @@
 		compatible = "rockchip,rk817";
 		reg = <0x20>;
 		interrupt-parent = <&gpio0>;
-		interrupts = <7 IRQ_TYPE_LEVEL_LOW>;
+		interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
 		pinctrl-names = "default", "pmic-sleep",
 				"pmic-power-off", "pmic-reset";
 		pinctrl-0 = <&pmic_int>;
@@ -845,6 +845,7 @@
 			hp-volume = <20>;
 			spk-volume = <3>;
 			mic-in-differential;
+			spk-ctl-gpios = <&gpio1 RK_PB4 GPIO_ACTIVE_LOW>;
 			status = "okay";
 		};
 	};
@@ -907,7 +908,7 @@
 	pmic {
 		pmic_int: pmic_int {
 			rockchip,pins =
-				<0 RK_PA7 RK_FUNC_GPIO &pcfg_pull_up>;
+				<0 RK_PB2 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 
 		soc_slppin_gpio: soc_slppin_gpio {
