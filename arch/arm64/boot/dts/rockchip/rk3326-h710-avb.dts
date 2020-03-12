@@ -31,7 +31,7 @@
 };
 
 &i2c2 {
-	status = "okay";
+	status = "disabled";
 
 	gc0312: gc0312@21 {
 		status = "okay";
@@ -89,11 +89,11 @@
 };
 
 &isp_mmu {
-	status = "okay";
+	status = "disabled";
 };
 
 &rkisp1 {
-	status = "okay";
+	status = "disabled";
 	pinctrl-names = "default";
 	pinctrl-0 = <&cif_clkout_m0 &dvp_d0d1_m0 &dvp_d2d9_m0 &dvp_d10d11_m0>;
 
