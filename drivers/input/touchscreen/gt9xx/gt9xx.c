@@ -1533,7 +1533,7 @@ static s32 gtp_init_panel(struct goodix_ts_data *ts)
             GTP_DEBUG("CFG_GROUP%d Config Version: %d, 0x%02X; IC Config Version: %d, 0x%02X", sensor_id+1, 
                         send_cfg_buf[sensor_id][0], send_cfg_buf[sensor_id][0], opr_buf[0], opr_buf[0]);
             
-            if (opr_buf[0] < 90)    
+            if (opr_buf[0] < 100)    
             {
                 GTP_INFO("  <%s>_%d \n", __func__, __LINE__);
                 grp_cfg_version = send_cfg_buf[sensor_id][0];       // backup group config version
@@ -2628,9 +2628,9 @@ static int goodix_ts_probe(struct i2c_client *client, const struct i2c_device_id
 
 	if (val == 89) {
 		m89or101 = TRUE;
-		gtp_change_x2y = TRUE;
-		gtp_x_reverse = FALSE;
-		gtp_y_reverse = TRUE;
+		gtp_change_x2y = FALSE;
+		gtp_x_reverse = TRUE;
+		gtp_y_reverse = FALSE;
 	} else if (val == 101) {
 		m89or101 = FALSE;
 		gtp_change_x2y = TRUE;

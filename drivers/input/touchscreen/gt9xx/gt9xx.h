@@ -41,7 +41,7 @@
 //#include <linux/earlysuspend.h>
 
 #define CONFIG_8_9  0
-#define DEBUG_SWITCH  0
+#define DEBUG_SWITCH  1
 
 //***************************PART1:ON/OFF define*******************************
 #define GTP_CUSTOM_CFG        0
@@ -79,8 +79,8 @@
 #define GTP_GESTURE_WAKEUP    0    // gesture wakeup
 
 #define GTP_DEBUG_ON          1
-#define GTP_DEBUG_ARRAY_ON    0
-#define GTP_DEBUG_FUNC_ON     0
+#define GTP_DEBUG_ARRAY_ON    1
+#define GTP_DEBUG_FUNC_ON     1
 
 /* init use fixed clk num */
 /* if open, u8 p_main_clk[6] = {69,69,69,69,69,167}; */
@@ -254,6 +254,7 @@ extern u16 total_len;
 // TODO: define your config for Sensor_ID == 5 here, if needed
 #define CTP_CFG_GROUP6 {\
     }
+
 
 // STEP_2(REQUIRED): Customize your I/O ports & I/O operations
 /*
