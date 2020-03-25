@@ -119,6 +119,10 @@
 			gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
                         default-state = "on";
 		};
+		2B5 {
+			gpios = <&gpio2 13 GPIO_ACTIVE_HIGH>;
+                        default-state = "on";
+		};
 	};
 
 	pwmleds {
@@ -883,6 +887,7 @@
 
 			vcc2v8_dvp: LDO_REG7 {
 				regulator-boot-on;
+				regulator-always-on;
 				regulator-min-microvolt = <2800000>;
 				regulator-max-microvolt = <2800000>;
 
@@ -895,6 +900,7 @@
 
 			vcc1v8_dvp: LDO_REG8 {
 				regulator-boot-on;
+				regulator-always-on;
 				regulator-min-microvolt = <1800000>;
 				regulator-max-microvolt = <1800000>;
 
@@ -907,6 +913,7 @@
 
 			vdd1v5_dvp: LDO_REG9 {
 				regulator-boot-on;
+				regulator-always-on;
 				regulator-min-microvolt = <1500000>;
 				regulator-max-microvolt = <1500000>;
 
