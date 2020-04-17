@@ -177,7 +177,7 @@
 			248 249 250 251 252 253 254 255>;
 			default-brightness-level = <200>;
 			enable-gpios = <&gpio3 6 GPIO_ACTIVE_HIGH>;
-			status = "disabled";
+			status = "okay";
 	};
 
 	charge-animation {
@@ -300,7 +300,7 @@
 	panel@0 {
 		compatible = "simple-panel-dsi";
 		reg = <0>;
-		//backlight = <&backlight>;
+		backlight = <&backlight>;
 		enable-gpios = <&gpio0 RK_PB5 GPIO_ACTIVE_LOW>;
 		reset-gpios = <&gpio3 RK_PA1 GPIO_ACTIVE_LOW>;
 		prepare-delay-ms = <20>;
