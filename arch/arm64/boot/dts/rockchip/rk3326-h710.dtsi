@@ -180,6 +180,15 @@
 			status = "okay";
 	};
 
+	multi_dais: multi-dais {
+			status = "okay";
+			compatible = "rockchip,multi-dais";
+			dais = <&pdm>, <&i2s1_2ch>;
+			capture,channel-mapping = <4 2>;
+			playback,channel-mapping = <0 0>;
+			#sound-dai-cells = <0>;
+	};
+
 	charge-animation {
 		compatible = "rockchip,uboot-charge";
 		rockchip,uboot-charge-on = <1>;
@@ -202,6 +211,7 @@
 			"IN1P", "Mic Jack",
 			"Headphone Jack", "HPOL",
 			"Headphone Jack", "HPOR";
+		
 		simple-audio-card,dai-link@0 {
 			format = "i2s";
 			cpu {
@@ -212,9 +222,9 @@
 			};
 		};
 		simple-audio-card,dai-link@1 {
-			format = "pdm";
+			format = "i2s";
 			cpu {
-				sound-dai = <&pdm>;
+				sound-dai = <&multi_dais>;
 			};
 			codec {
 				sound-dai = <&rk817_codec 1>;
@@ -286,12 +296,13 @@
 &pdm {
 	status = "okay";
 	#sound-dai-cells = <0>;
+	rockchip,no-dmaengine;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pdm_clk0m1
 		&pdm_clk1
+                &pdm_sdi0m1
 		&pdm_sdi1
-		&pdm_sdi2
-		&pdm_sdi3>;
+		&pdm_sdi2>;
 };
 
 &dsi {
@@ -1012,6 +1023,10 @@
 &i2s1_2ch {
 	status = "okay";
 	#sound-dai-cells = <0>;
+	pinctrl-0 = <&i2s1_2ch_sclk
+		     &i2s1_2ch_lrck
+		     &i2s1_2ch_sdo
+		     >;
 };
 
 &io_domains {
