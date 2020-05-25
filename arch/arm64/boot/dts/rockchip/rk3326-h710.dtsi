@@ -184,7 +184,7 @@
 			status = "okay";
 			compatible = "rockchip,multi-dais";
 			dais = <&pdm>, <&i2s1_2ch>;
-			capture,channel-mapping = <4 2>;
+			capture,channel-mapping = <6 2>;
 			playback,channel-mapping = <0 0>;
 			#sound-dai-cells = <0>;
 	};
@@ -302,7 +302,8 @@
 		&pdm_clk1
                 &pdm_sdi0m1
 		&pdm_sdi1
-		&pdm_sdi2>;
+		&pdm_sdi2
+		&pdm_sdi3>;
 };
 
 &dsi {
