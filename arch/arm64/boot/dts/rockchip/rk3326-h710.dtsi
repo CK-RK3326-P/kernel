@@ -127,21 +127,25 @@
 
 	pwmleds {
         	compatible = "pwm-leds";
+		status = "okay";
+		/*
         	led1 {
             		label = "pwm0";
-            		pwms = <&pwm0 0 25000 0>;
+            		pwms = <&pwm0 0 25000000 0>;
             		max-brightness = <255>;
-        	};
+			brightness = <100>;
+        	};*/
 		led2 {
 			label = "pwm1";
-                        pwms = <&pwm1 0 25000 0>;
+                        pwms = <&pwm1 0 25000000 1>;
                         max-brightness = <255>;
+			brightness = <100>;
 		};
     	};
 
 	backlight: backlight {
 		compatible = "pwm-backlight";
-		pwms = <&pwm1 0 25000 0>;
+		pwms = <&pwm0 0 25000 0>;
 		brightness-levels = <
 			 0   10  10  11  11  12  12  13
 			 13  14  14  15  15  16  16  17
@@ -177,7 +181,6 @@
 			248 249 250 251 252 253 254 255>;
 			default-brightness-level = <200>;
 			enable-gpios = <&gpio3 6 GPIO_ACTIVE_HIGH>;
-			status = "okay";
 	};
 
 	multi_dais: multi-dais {
@@ -994,7 +997,7 @@
 			use-ext-amplifier;
 			hp-volume = <20>;
 			spk-volume = <3>;
-			spk-ctl-gpios = <&gpio1 RK_PB4 GPIO_ACTIVE_LOW>;
+			spk-ctl-gpios = <&gpio1 RK_PB4 GPIO_ACTIVE_HIGH>;
 			status = "okay";
 		};
 	};
@@ -1191,6 +1194,8 @@
 
 &uart2 {
 	status = "okay";
+	pinctrl-names = "default";
+        pinctrl-0 = <&uart2m1_xfer>;
 };
 
 &vip_mmu {
