@@ -29,11 +29,11 @@ u8 gtp_dat_8_9[] = {
 	/* <1920, 1200> 8.9 */
 	/* #include "WGJ89006B_GT9271_Config_20140625_085816_0X41.cfg" */
 	/* #include "WGJ10162_GT9271_Config_20140820_182456.cfg" */
-	#include "H710.cfg"
+	#include "XYH7194_400X1280_GT911_Config_left.cfg"
 };
 
 u8 gtp_dat_8_9_1[] = {
-	#include "H710.cfg"
+	#include "XYH7194_400X1280_GT911_Config_left.cfg"
 };
 
 u8 gtp_dat_9_7[] = {
